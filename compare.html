@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Costera — Before / After</title>
+    <style>
+      body { margin:0; font-family: 'Inter', system-ui, sans-serif; background:#eceff4; }
+      .grid { display:grid; grid-template-columns:1fr 1fr; height:100vh; }
+      .grid > div { display:flex; flex-direction:column; border-right:1px solid #d8dee9; }
+      .label { padding:.5rem 1rem; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#fff; }
+      iframe { flex:1; width:100%; border:0; }
+    </style>
+  </head>
+  <body>
+    <div class="grid">
+      <div><div class="label" style="background:#d08770">Before</div><iframe src="./before.html"></iframe></div>
+      <div><div class="label" style="background:#5e81ac">After</div><iframe src="./after.html"></iframe></div>
+    </div>
+  </body>
+</html>

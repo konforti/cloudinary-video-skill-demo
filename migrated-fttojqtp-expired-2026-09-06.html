@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Costera Playa Azul — Rooms &amp; Suites</title>
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/app.css" />
+
+    <!-- Cloudinary Video Player, pinned. Loaded as a script so it reaches
+         js/after.js on window.cloudinary — the pattern Cloudinary's own React
+         guide uses, and the one that avoids the ESM plugin-registration order
+         problem in its npm entry point. -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/cloudinary-video-player@4.1.0/dist/cld-video-player.min.css"
+    />
+    <script src="https://unpkg.com/cloudinary-video-player@4.1.0/dist/cld-video-player.min.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <span class="brand" data-brand></span>
+        <span class="tagline" data-tagline></span>
+        <span data-state-badge></span>
+      </div>
+    </header>
+
+    <div class="run-note">
+      Built from scratch by running <code>DEMO-PROMPT.md</code> — cloud
+      <code>fttojqtp</code> was provisioned, loaded and warmed for this page.
+      It expires 2026-09-06 unless claimed.
+      Machine tags and translated subtitles are absent: a fresh cloud has no add-ons.
+    </div>
+
+    <main>
+      <h1 data-property></h1>
+      <p class="lede" data-lede></p>
+
+      <div class="player-row">
+        <div class="player-host" data-player></div>
+        <aside class="rail" data-rail hidden></aside>
+      </div>
+
+      <div class="cart-notice" data-cart hidden></div>
+
+      <section data-transcript hidden></section>
+
+      <section class="grid-section" data-grid-section></section>
+      <section class="reviews" data-reviews></section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner" data-footer></div>
+    </footer>
+
+    <script type="module" src="js/migrated-fttojqtp.js"></script>
+  </body>
+</html>
