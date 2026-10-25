@@ -8,7 +8,7 @@ import {
   roomBySku,
   formatTime,
 } from './data.js';
-import { after, BREAKPOINTS } from './media.js';
+import { after } from './media.js';
 import { features } from './features.js';
 import { renderChrome, renderGrid, renderReviews } from './shared.js';
 
@@ -44,40 +44,45 @@ const host = document.querySelector('[data-player]');
  * first interaction swaps in the player and starts playback.
  */
 let player = null;
+let building = null;
 const playerReady = [];
 
 /** Runs `fn` once the player exists, building it on the first call. */
 function withPlayer(fn) {
   if (player) return fn(player);
   playerReady.push(fn);
-  if (playerReady.length === 1) buildPlayer();
+  void buildPlayer();
 }
 
+/**
+ * `cloudinary.player()` is async, so a second click can arrive while the first
+ * build is in flight. Every caller shares one build rather than starting its own.
+ */
 function buildPlayer(autoplay = false) {
-  const el = document.createElement('video');
-  el.className = 'cld-video-player cld-fluid';
-  el.playsInline = true;
-  host.replaceChildren(el);
+  building ??= (async () => {
+    const el = document.createElement('video');
+    el.className = 'cld-video-player cld-fluid';
+    el.playsInline = true;
+    host.replaceChildren(el);
 
-  player = createPlayer(el);
-  attachSource(player, autoplay);
+    player = await createPlayer(el);
+    attachSource(player);
 
-  for (const fn of playerReady.splice(0)) fn(player);
-  return player;
+    for (const fn of playerReady.splice(0)) fn(player);
+    return player;
+  })();
+  if (autoplay) void building.then((p) => p.play());
+  return building;
 }
 
 function createPlayer(el) {
-  return window.cloudinary.videoPlayer(el, {
+  return window.cloudinary.player(el, {
     cloudName: CLOUD_NAME,
-    // Adaptive streaming: the player negotiates rendition instead of pulling one MP4.
-    sourceTypes: features.adaptiveStreaming ? ['hls'] : ['mp4'],
-    // `breakpoints` must stay OFF while adaptive streaming is on. It makes the
-    // player prepend a resize (c_limit,w_…) to the source URL, and Cloudinary
-    // rejects a resize combined with sp_auto — the streaming profile already
-    // defines the rendition ladder. Breakpoints are for the MP4 path only.
-    ...(features.adaptiveStreaming
-      ? {}
-      : { breakpoints: { enabled: true, sizes: BREAKPOINTS } }),
+    // One branch or the other, never both. Adaptive streaming emits sp_auto, and
+    // the streaming profile owns resolution — `breakpoints` would prepend a
+    // resize (c_limit,w_…) that Cloudinary rejects alongside sp_auto. The
+    // progressive branch leaves sourceTypes unset so f_auto:video stays on.
+    ...(features.adaptiveStreaming ? { sourceTypes: ['hls'] } : { breakpoints: true }),
     seekThumbnails: features.seekThumbnails,
     chaptersButton: features.chapters,
     fluid: features.responsivePlayer,
@@ -89,7 +94,7 @@ function createPlayer(el) {
   });
 }
 
-function attachSource(player, autoplay) {
+function attachSource(player) {
   player.source(HERO_PUBLIC_ID, {
     // Auto-generated chapters: loads costera/hero-tour-chapters.vtt
     ...(features.chapters ? { chapters: true } : {}),
@@ -119,11 +124,8 @@ function attachSource(player, autoplay) {
                     { label: 'Français', language: 'fr', url: after.transcript('fr') },
                   ]
                 : []),
-              // Audio description, as a subtitles track — the player has no
-              // native descriptions kind, so this is described *text*: the
-              // visual transcription from AI Video Analysis, describing what
-              // is on screen rather than what is said.
-              { label: 'AD', language: 'en', url: after.audioDescription },
+              // No audio-description track: it needs AI Video Analysis, which
+              // cannot be signed over the MCP. See after.audioDescription.
             ],
             options: { theme: 'player-colors' },
           },
@@ -149,7 +151,6 @@ function attachSource(player, autoplay) {
   });
 
   if (features.chapters) bindChapterRail(player);
-  if (autoplay) void player.play();
 }
 
 /**

@@ -57,7 +57,7 @@ export const after = {
   /**
    * Audio description track.
    *
-   * NOT PRESENT on the cloud this file points at — it 404s on dxuiuruim, and
+   * NOT PRESENT on the cloud this file points at — it 404s on raz, and
    * cannot be produced there: the analysis endpoint has no MCP tool, so an
    * agent working through the MCP has no API secret to sign the call with. It
    * works on a self-provisioned cloud, where CLOUDINARY_URL carries the secret
@@ -100,9 +100,3 @@ export const after = {
   },
 };
 
-/**
- * Responsive breakpoints, pinned explicitly rather than left open. Every variant
- * the player can request at these widths must be derived and warm before a demo —
- * an un-derived variant requested for the first time live is a visible stall.
- */
-export const BREAKPOINTS = [320, 480, 640, 768, 1024, 1280, 1600, 1920];
